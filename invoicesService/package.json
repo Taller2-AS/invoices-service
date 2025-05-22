@@ -1,0 +1,22 @@
+{
+  "name": "invoicesservice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "seed": "node src/database/seeders/seeder.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@faker-js/faker": "^9.8.0",
+    "@grpc/grpc-js": "^1.13.4",
+    "@grpc/proto-loader": "^0.7.15",
+    "amqplib": "^0.10.8",
+    "dotenv": "^16.5.0",
+    "mongoose": "^8.15.0"
+  }
+}
