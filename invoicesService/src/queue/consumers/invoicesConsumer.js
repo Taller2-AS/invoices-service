@@ -19,7 +19,7 @@ const invoicesConsumer = async () => {
     }
   });
 
-  console.log('👂 Escuchando mensajes en "invoice-events-queue"...');
+  console.log('Escuchando mensajes en "invoice-events-queue"...');
 };
 
 module.exports = invoicesConsumer;
