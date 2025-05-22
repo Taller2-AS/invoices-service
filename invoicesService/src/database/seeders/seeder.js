@@ -1,5 +1,5 @@
 const dotenv = require('dotenv');
-const sequelize = require('../database/sequelize');
+const sequelize = require('../sequelize');
 const insertFakeInvoices = require('./invoiceSeeder');
 
 dotenv.config();

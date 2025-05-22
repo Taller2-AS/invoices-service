@@ -10,6 +10,9 @@ const sequelize = new Sequelize(
     port: process.env.DB_PORT || 3306,
     dialect: 'mariadb',
     logging: false,
+    dialectOptions: {
+      connectTimeout: 10000,
+    },
   }
 );
 

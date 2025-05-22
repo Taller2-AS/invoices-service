@@ -1,4 +1,4 @@
-const Invoice = require('../database/models/invoiceModel');
+const Invoice = require('../models/invoiceModel');
 const generateFakeInvoice = require('../fakers/invoiceFaker');
 
 const insertFakeInvoices = async (cantidad = 300) => {
