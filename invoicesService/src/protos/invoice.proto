@@ -12,7 +12,7 @@ service InvoiceService {
 
 message Invoice {
   int32 id = 1;
-  string cliente = 2;
+  string userId = 2;
   double monto = 3;
   string estado = 4;
   string createdAt = 5;
@@ -20,8 +20,9 @@ message Invoice {
 }
 
 message InvoiceInput {
-  string cliente = 1;
+  string userId = 1;
   double monto = 2;
+  string estado = 3;
 }
 
 message InvoiceUpdateInput {

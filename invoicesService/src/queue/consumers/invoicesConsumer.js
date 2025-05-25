@@ -3,7 +3,9 @@ const { getChannel } = require('../config/connection');
 const invoicesConsumer = async () => {
   const channel = await getChannel();
 
-  channel.consume('invoice-events-queue', async (msg) => {
+  await channel.assertQueue('invoice-events-queue', { durable: true });
+
+  await channel.consume('invoice-events-queue', async (msg) => {
     if (!msg) return;
 
     try {

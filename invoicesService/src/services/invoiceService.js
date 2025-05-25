@@ -3,22 +3,27 @@ const { getChannel, EXCHANGE_NAME } = require('../queue/config/connection');
 
 const createInvoice = async (call, callback) => {
   try {
-    const { cliente, monto } = call.request;
+    const { userId, monto, estado } = call.request;
 
-    const newInvoice = await Invoice.create({ cliente, monto });
+    const newInvoice = await Invoice.create({
+      userId,
+      monto,
+      estado: estado || 'Pendiente'
+    });
 
     const channel = await getChannel();
     channel.publish(EXCHANGE_NAME, '', Buffer.from(JSON.stringify({
       event: 'INVOICE_CREATED',
       id: newInvoice.id,
-      cliente,
+      userId,
       monto,
+      estado: newInvoice.estado,
       timestamp: new Date().toISOString()
     })));
 
     callback(null, {
       id: newInvoice.id,
-      cliente: newInvoice.cliente,
+      userId: newInvoice.userId,
       monto: newInvoice.monto,
       estado: newInvoice.estado,
       createdAt: newInvoice.createdAt.toISOString(),
@@ -38,7 +43,7 @@ const getInvoiceById = async (call, callback) => {
 
     callback(null, {
       id: invoice.id,
-      cliente: invoice.cliente,
+      userId: invoice.userId,
       monto: invoice.monto,
       estado: invoice.estado,
       createdAt: invoice.createdAt.toISOString(),
@@ -56,9 +61,9 @@ const updateInvoice = async (call, callback) => {
     const invoice = await Invoice.findByPk(id);
     if (!invoice) return callback(new Error('Factura no encontrada'));
 
-    invoice.cliente = cliente || invoice.cliente;
-    invoice.monto = monto || invoice.monto;
-    invoice.estado = estado || invoice.estado;
+    // `cliente` está mal nombrado en el .proto, lo ignoramos para mantener compatibilidad
+    invoice.monto = monto ?? invoice.monto;
+    invoice.estado = estado ?? invoice.estado;
 
     await invoice.save();
 
@@ -71,7 +76,7 @@ const updateInvoice = async (call, callback) => {
 
     callback(null, {
       id: invoice.id,
-      cliente: invoice.cliente,
+      userId: invoice.userId,
       monto: invoice.monto,
       estado: invoice.estado,
       createdAt: invoice.createdAt.toISOString(),
@@ -110,7 +115,7 @@ const listInvoices = async (call, callback) => {
 
     const response = invoices.map(inv => ({
       id: inv.id,
-      cliente: inv.cliente,
+      userId: inv.userId,
       monto: inv.monto,
       estado: inv.estado,
       createdAt: inv.createdAt.toISOString(),

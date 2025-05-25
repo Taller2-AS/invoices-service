@@ -4,11 +4,11 @@ const sequelize = require('../sequelize');
 const Invoice = sequelize.define('Invoice', {
   id: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
+    primaryKey: true
   },
-  cliente: {
-    type: DataTypes.STRING,
+  userId: {
+    type: DataTypes.STRING(36),  
     allowNull: false
   },
   monto: {
@@ -17,11 +17,20 @@ const Invoice = sequelize.define('Invoice', {
   },
   estado: {
     type: DataTypes.ENUM('Pendiente', 'Pagado', 'Vencido'),
+    allowNull: false,
     defaultValue: 'Pendiente'
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    allowNull: false
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    allowNull: false
   }
 }, {
-  timestamps: true,
-  tableName: 'facturas'
+  tableName: 'facturas',
+  timestamps: true
 });
 
 module.exports = Invoice;

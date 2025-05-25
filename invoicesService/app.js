@@ -13,17 +13,11 @@ sequelize.authenticate()
     console.log('Conexión a base de datos MariaDB exitosa');
     return sequelize.sync(); // sincroniza modelos
   })
-  .catch((err) => {
-    console.error('Error de conexión con MariaDB:', err.message);
-    process.exit(1);
-  });
-
-// Inicializar consumidores de RabbitMQ
-initializeQueueConsumers()
+  .then(() => initializeQueueConsumers())
   .then(() => console.log('RabbitMQ Consumers inicializados'))
   .catch(err => {
-    console.error('Error iniciando consumidores:');
-    console.error(err);
+    console.error('Error al iniciar:', err.message);
+    process.exit(1);
   });
 
 // Servidor gRPC
