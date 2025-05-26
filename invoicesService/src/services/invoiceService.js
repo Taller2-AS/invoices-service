@@ -56,14 +56,20 @@ const getInvoiceById = async (call, callback) => {
 
 const updateInvoice = async (call, callback) => {
   try {
-    const { id, cliente, monto, estado } = call.request;
+    const { id, estado } = call.request;
+
+    if (!id || !estado) {
+      return callback(new Error('Faltan campos obligatorios: id y estado'));
+    }
 
     const invoice = await Invoice.findByPk(id);
     if (!invoice) return callback(new Error('Factura no encontrada'));
 
-    // `cliente` está mal nombrado en el .proto, lo ignoramos para mantener compatibilidad
-    invoice.monto = monto ?? invoice.monto;
-    invoice.estado = estado ?? invoice.estado;
+    invoice.estado = estado;
+
+    if (estado === 'Pagado') {
+      invoice.fechaPago = new Date();
+    }
 
     await invoice.save();
 
@@ -71,6 +77,7 @@ const updateInvoice = async (call, callback) => {
     channel.publish(EXCHANGE_NAME, '', Buffer.from(JSON.stringify({
       event: 'INVOICE_UPDATED',
       id: invoice.id,
+      estado: invoice.estado,
       timestamp: new Date().toISOString()
     })));
 
@@ -80,7 +87,8 @@ const updateInvoice = async (call, callback) => {
       monto: invoice.monto,
       estado: invoice.estado,
       createdAt: invoice.createdAt.toISOString(),
-      updatedAt: invoice.updatedAt.toISOString()
+      updatedAt: invoice.updatedAt.toISOString(),
+      fechaPago: invoice.fechaPago ? invoice.fechaPago.toISOString() : null
     });
   } catch (err) {
     callback(err);

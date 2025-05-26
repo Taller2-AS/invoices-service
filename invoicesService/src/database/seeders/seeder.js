@@ -17,6 +17,7 @@ const seedFromUsuariosJson = async () => {
       await sequelize.sync({ force: true });
     } else {
       console.log('Borrando datos sin eliminar tablas...');
+      await sequelize.sync();
       await Invoice.destroy({ where: {}, truncate: true });
       await User.destroy({ where: {}, truncate: true });
     }
@@ -35,10 +36,14 @@ const seedFromUsuariosJson = async () => {
 
     for (let i = 0; i < 300; i++) {
       const usuario = faker.helpers.arrayElement(usuariosReducidos);
+      const estado = faker.helpers.arrayElement(estados);
+      const fechaPago = estado === 'Pagado' ? faker.date.recent() : null;
+
       facturas.push({
         userId: usuario.id,
         monto: faker.number.int({ min: 10000, max: 100000 }),
-        estado: faker.helpers.arrayElement(estados),
+        estado,
+        fechaPago,
         createdAt: faker.date.past(),
         updatedAt: faker.date.recent()
       });

@@ -17,6 +17,7 @@ message Invoice {
   string estado = 4;
   string createdAt = 5;
   string updatedAt = 6;
+  string fechaPago = 7;
 }
 
 message InvoiceInput {
@@ -27,9 +28,7 @@ message InvoiceInput {
 
 message InvoiceUpdateInput {
   int32 id = 1;
-  string cliente = 2;
-  double monto = 3;
-  string estado = 4;
+  string estado = 2;
 }
 
 message InvoiceId {

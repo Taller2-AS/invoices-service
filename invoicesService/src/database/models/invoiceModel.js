@@ -27,7 +27,12 @@ const Invoice = sequelize.define('Invoice', {
   updatedAt: {
     type: DataTypes.DATE,
     allowNull: false
+  },
+  fechaPago: {
+  type: DataTypes.DATE,
+  allowNull: true
   }
+  
 }, {
   tableName: 'facturas',
   timestamps: true
