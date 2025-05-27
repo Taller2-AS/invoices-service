@@ -1,5 +1,6 @@
 const Invoice = require('../database/models/invoiceModel');
 const { getChannel, EXCHANGE_NAME } = require('../queue/config/connection');
+const publishLog = require('../queue/publisher/logPublisher');
 
 const createInvoice = async (call, callback) => {
   try {
@@ -21,6 +22,15 @@ const createInvoice = async (call, callback) => {
       timestamp: new Date().toISOString()
     })));
 
+    await publishLog('action', {
+      userId,
+      email: '',
+      method: 'CreateInvoice',
+      url: '/invoices',
+      action: 'CREAR FACTURA',
+      date: new Date().toISOString()
+    });
+
     callback(null, {
       id: newInvoice.id,
       userId: newInvoice.userId,
@@ -30,6 +40,12 @@ const createInvoice = async (call, callback) => {
       updatedAt: newInvoice.updatedAt.toISOString()
     });
   } catch (err) {
+    await publishLog('error', {
+      userId: null,
+      email: '',
+      error: err.message,
+      date: new Date().toISOString()
+    });
     callback(err);
   }
 };
@@ -39,7 +55,15 @@ const getInvoiceById = async (call, callback) => {
     const { id } = call.request;
     const invoice = await Invoice.findByPk(id);
 
-    if (!invoice) return callback(new Error('Factura no encontrada'));
+    if (!invoice) {
+      await publishLog('error', {
+        userId: null,
+        email: '',
+        error: 'Factura no encontrada',
+        date: new Date().toISOString()
+      });
+      return callback(new Error('Factura no encontrada'));
+    }
 
     callback(null, {
       id: invoice.id,
@@ -50,6 +74,12 @@ const getInvoiceById = async (call, callback) => {
       updatedAt: invoice.updatedAt.toISOString()
     });
   } catch (err) {
+    await publishLog('error', {
+      userId: null,
+      email: '',
+      error: err.message,
+      date: new Date().toISOString()
+    });
     callback(err);
   }
 };
@@ -63,7 +93,15 @@ const updateInvoice = async (call, callback) => {
     }
 
     const invoice = await Invoice.findByPk(id);
-    if (!invoice) return callback(new Error('Factura no encontrada'));
+    if (!invoice) {
+      await publishLog('error', {
+        userId: null,
+        email: '',
+        error: 'Factura no encontrada',
+        date: new Date().toISOString()
+      });
+      return callback(new Error('Factura no encontrada'));
+    }
 
     invoice.estado = estado;
 
@@ -81,6 +119,15 @@ const updateInvoice = async (call, callback) => {
       timestamp: new Date().toISOString()
     })));
 
+    await publishLog('action', {
+      userId: invoice.userId,
+      email: '',
+      method: 'UpdateInvoice',
+      url: `/invoices/${id}`,
+      action: 'ACTUALIZAR FACTURA',
+      date: new Date().toISOString()
+    });
+
     callback(null, {
       id: invoice.id,
       userId: invoice.userId,
@@ -91,6 +138,12 @@ const updateInvoice = async (call, callback) => {
       fechaPago: invoice.fechaPago ? invoice.fechaPago.toISOString() : null
     });
   } catch (err) {
+    await publishLog('error', {
+      userId: null,
+      email: '',
+      error: err.message,
+      date: new Date().toISOString()
+    });
     callback(err);
   }
 };
@@ -100,7 +153,15 @@ const deleteInvoice = async (call, callback) => {
     const { id } = call.request;
 
     const invoice = await Invoice.findByPk(id);
-    if (!invoice) return callback(new Error('Factura no encontrada'));
+    if (!invoice) {
+      await publishLog('error', {
+        userId: null,
+        email: '',
+        error: 'Factura no encontrada',
+        date: new Date().toISOString()
+      });
+      return callback(new Error('Factura no encontrada'));
+    }
 
     await invoice.destroy();
 
@@ -111,8 +172,23 @@ const deleteInvoice = async (call, callback) => {
       timestamp: new Date().toISOString()
     })));
 
+    await publishLog('action', {
+      userId: invoice.userId,
+      email: '',
+      method: 'DeleteInvoice',
+      url: `/invoices/${id}`,
+      action: 'ELIMINAR FACTURA',
+      date: new Date().toISOString()
+    });
+
     callback(null, {});
   } catch (err) {
+    await publishLog('error', {
+      userId: null,
+      email: '',
+      error: err.message,
+      date: new Date().toISOString()
+    });
     callback(err);
   }
 };
@@ -132,6 +208,12 @@ const listInvoices = async (call, callback) => {
 
     callback(null, { invoices: response });
   } catch (err) {
+    await publishLog('error', {
+      userId: null,
+      email: '',
+      error: err.message,
+      date: new Date().toISOString()
+    });
     callback(err);
   }
 };
