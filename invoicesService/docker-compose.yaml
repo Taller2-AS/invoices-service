@@ -24,14 +24,14 @@ services:
       - "5673:5672"
       - "15673:15672"
 
-  invoices-service:
-    build: .
-    container_name: invoices-service
-    restart: always
-    env_file:
-      - .env
-    depends_on:
-      - mariadb-invoices
-      - rabbitmq-invoices
-    ports:
-      - "50052:50052"
+  #invoices-service:
+  #  build: .
+  #  container_name: invoices-service
+  #  restart: always
+  #  env_file:
+  #    - .env
+  #  depends_on:
+  #    - mariadb-invoices
+  #    - rabbitmq-invoices
+  #  ports:
+  #    - "50052:50052"
