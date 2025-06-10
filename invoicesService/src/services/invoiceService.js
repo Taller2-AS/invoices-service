@@ -1,6 +1,7 @@
 const Invoice = require('../database/models/invoiceModel');
 const { getChannel, EXCHANGE_NAME } = require('../queue/config/connection');
 const publishLog = require('../queue/publisher/logPublisher');
+const User = require('../database/models/userModel');
 
 const createInvoice = async (call, callback) => {
   try {
@@ -104,24 +105,32 @@ const updateInvoice = async (call, callback) => {
     }
 
     invoice.estado = estado;
-
     if (estado === 'Pagado') {
       invoice.fechaPago = new Date();
     }
 
     await invoice.save();
 
+    const user = await User.findByPk(invoice.userId);
+    if (!user) {
+      console.warn(`⚠️ Usuario no encontrado para userId: ${invoice.userId}`);
+    }
+
     const channel = await getChannel();
     channel.publish(EXCHANGE_NAME, '', Buffer.from(JSON.stringify({
       event: 'INVOICE_UPDATED',
       id: invoice.id,
+      userId: invoice.userId,
+      monto: invoice.monto,
       estado: invoice.estado,
+      email: user?.email || '',
+      nombre: user?.nombre || '',
       timestamp: new Date().toISOString()
     })));
 
     await publishLog('action', {
       userId: invoice.userId,
-      email: '',
+      email: user?.email || '',
       method: 'UpdateInvoice',
       url: `/invoices/${id}`,
       action: 'ACTUALIZAR FACTURA',
